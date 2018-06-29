@@ -532,10 +532,10 @@ class loadcellThread(threading.Thread):
 
     def run(self):
         while self.runSignal:
-            time.sleep(0.0005)
+            time.sleep(0.001)
             try:
                 new_load = float(self.ser.readline()[1:].decode('ascii','ignore').strip())/1000
-                logger.debug(new_load)
+                #logger.debug(new_load)
                 self.rx_queue.put((time.time(),new_load))
             except ValueError:
                 pass
@@ -704,19 +704,24 @@ class GraphDialog(QDialog):
         self.clear_button = QPushButton("Clear Data")
         self.clear_button.clicked.connect(self.clear_data)
         
-        self.clear_button = QPushButton("Export Data")
-        self.clear_button.clicked.connect(self.export_data)
+        self.export_button = QPushButton("Export Data")
+        self.export_button.clicked.connect(self.export_data)
+
         # set the layout
         layout = QVBoxLayout()
         layout.addWidget(self.canvas)
         layout.addWidget(self.update_button)
         layout.addWidget(self.clear_button)
+        layout.addWidget(self.export_button)
         layout.addWidget(self.toolbar)
         self.setLayout(layout)
         #self.show()
     
     def clear_data(self):
         self.data = {}
+        self.root.load_history=[]
+        self.plot()
+        logger.debug("Cleared Graph")
 
     def export_data(self):
         csv_string = ''
